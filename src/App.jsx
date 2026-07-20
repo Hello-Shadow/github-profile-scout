@@ -3,13 +3,16 @@ import { CardContainer, CardBody, CardItem } from "./components/ThreeDCard";
 import AiReviewCard from "./components/AiReviewCard";
 
 export default function App() {
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState(
+    () => localStorage.getItem("github_scout_username") || "",
+  );
   const [userData, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
   async function scoutProfile() {
     if (username === "") return;
+    localStorage.setItem("github_scout_username", username);
     setIsLoading(true);
     setError(null);
     setUserData(null);
