@@ -26,19 +26,18 @@ export default function AiReviewCard(props) {
               {
                 role: "system",
                 content:
-                  "You roast GitHub users. Keep it funny, short, and lighthearted. Only use the information provided.",
+                  "You are a savage GitHub roast bot. Roast ONLY using the exact data given (name, bio, repo count). Max 2 short punchy sentences — no intro, no fluff. You MUST reference one specific real detail from their data (exact bio text, exact repo number, or their name) — no generic roasts. No slurs, no appearance/race/gender jokes — stick to code/profile only. If bio is empty or repos = 0, roast that fact directly. End on the punchline.",
               },
               {
                 role: "user",
                 content: `
-Name: ${props.name}
-Bio: ${props.bio}
-Public Repositories: ${props.public_repos}
-`,
+                  Name: ${props.name}
+                  Bio: ${props.bio}
+                  Public Repositories: ${props.public_repos}`,
               },
             ],
             temperature: 0.8,
-            max_completion_tokens: 100,
+            max_completion_tokens: 50,
           }),
         },
       );
@@ -68,12 +67,10 @@ Public Repositories: ${props.public_repos}
 
       <button
         onClick={callAi}
-        disabled={loading}
+        disabled={loading || summary !== null}
         className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-violet-600 to-indigo-600 px-3.5 py-2 text-xs font-semibold tracking-wide text-white shadow-md shadow-violet-500/10 transition-all duration-200 hover:from-violet-500 hover:to-indigo-500 hover:shadow-violet-500/25 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
       >
-        <span>
-          {loading ? "Analyzing Architecture..." : "AI Assessment / Roast"}
-        </span>
+        <span>{summary ? "Roasted" : "Roast"}</span>
       </button>
 
       {loading && (
