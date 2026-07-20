@@ -9,17 +9,26 @@ export default function App() {
   const [userData, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [recentRepos, setRecentRepos] = useState([]);
 
   async function scoutProfile() {
     if (username === "") return;
+
     localStorage.setItem("github_scout_username", username);
+
     setIsLoading(true);
     setError(null);
     setUserData(null);
+    setRecentRepos([]);
 
     try {
       const response = await fetch(`https://api.github.com/users/${username}`);
       const data = await response.json();
+      const repoResponse = await fetch(
+        `https://api.github.com/users/${username}/repos?sort=updated&per_page=5`,
+      );
+      const repoData = await repoResponse.json();
+      setRecentRepos(repoData);
 
       if (data.message === "Not Found") {
         setError("User not found on GitHub!");
@@ -113,6 +122,7 @@ export default function App() {
                 name={userData.name || userData.login}
                 bio={userData.bio}
                 public_repos={userData.public_repos}
+                recent_repos={recentRepos}
               />
             </CardItem>
           </CardBody>

@@ -10,6 +10,13 @@ export default function AiReviewCard(props) {
     setLoading(true);
     setSummary(null);
     setError(null);
+    const repoSummary =
+      props.recent_repos && props.recent_repos.length > 0
+        ? props.recent_repos.map(
+            (data) =>
+              `Name: ${data.name}, Language: ${data.language || "Unknown"}`,
+          )
+        : "No public repositories found!";
 
     try {
       const response = await fetch(
@@ -26,18 +33,19 @@ export default function AiReviewCard(props) {
               {
                 role: "system",
                 content:
-                  "You are a savage GitHub roast bot. Roast ONLY using the exact data given (name, bio, repo count). Max 2 short punchy sentences — no intro, no fluff. You MUST reference one specific real detail from their data (exact bio text, exact repo number, or their name) — no generic roasts. No slurs, no appearance/race/gender jokes — stick to code/profile only. If bio is empty or repos = 0, roast that fact directly. End on the punchline.",
+                  "You are a savage GitHub roast bot. Roast ONLY using the exact data given: name, bio, repo count, and their top repos with languages. Use SIMPLE, EASY English — short common words, no fancy vocabulary. Max 2 short punchy sentences, no intro, no fluff. You MUST mention at least one real detail — a specific repo name, a specific language, or exact bio text. No generic roasts. No slurs, no appearance/race/gender jokes — stick to code, repo names, and language choices only. If bio is empty or repos = 0, roast that fact directly. End on the punchline, don't explain the joke.",
               },
               {
                 role: "user",
                 content: `
                   Name: ${props.name}
-                  Bio: ${props.bio}
-                  Public Repositories: ${props.public_repos}`,
+                  Bio: ${props.bio || "No bio"}
+                  Public Repositories: ${props.public_repos}
+                  Top Recent Repositories: ${repoSummary}`,
               },
             ],
             temperature: 0.8,
-            max_completion_tokens: 50,
+            max_completion_tokens: 100,
           }),
         },
       );
@@ -51,7 +59,7 @@ export default function AiReviewCard(props) {
       }
     } catch (err) {
       console.error(err);
-      setError("⚡ AI inference failed. Check network or API key.");
+      setError("AI inference failed. Check network or API key.");
     } finally {
       setLoading(false);
     }
